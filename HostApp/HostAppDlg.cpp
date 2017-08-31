@@ -6,6 +6,8 @@
 #include "HostApp.h"
 #include "HostAppDlg.h"
 
+#include <ppltasks.h>
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -23,7 +25,7 @@ CHostAppDlg::CHostAppDlg(CWnd* pParent /*=NULL*/)
 
 void CHostAppDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	CDialog::DoDataExchange( pDX );
 }
 
 BEGIN_MESSAGE_MAP(CHostAppDlg, CDialog )
@@ -47,8 +49,8 @@ BOOL CHostAppDlg::OnInitDialog()
 	HWND hwndOwner = *this;
 	param.Format( _T( "%p" ), hwndOwner );
 	SetDlgItemText( ID_HOST_HWND, param );
-
-	auto hRes = m_fileMap.MapSharedMem( 1024, _T( "SampleFileMapping" ) );
+	SetDlgItemText( IDC_EDT_FILEMAP, _T( "転送テスト用FileMapテキスト" ) );
+	auto hRes = m_fileMap.MapSharedMem( 1024, _T( "Wankuma-Yokohama#10-SharedMem" ) );
 	if( FAILED( hRes ) )
 	{
 		CString msg;
@@ -61,6 +63,7 @@ BOOL CHostAppDlg::OnInitDialog()
 
 void CHostAppDlg::OnOK()
 {
+	GetDlgItemText( IDC_EDT_FILEMAP, m_fileMap, m_fileMap.GetMappingSize() );
 	TCHAR	modulePath[MAX_PATH];
 	GetModuleFileName( nullptr, modulePath, MAX_PATH );
 	*PathFindFileName( modulePath ) = _T( '\0' );
@@ -79,8 +82,18 @@ void CHostAppDlg::OnOK()
 	info.nShow = SW_SHOWNORMAL;
 	if( ShellExecuteEx( &info ) )
 	{
-		//	更新通知を受け取るためのイベントタスクを起こしておく...
-		CloseHandle( info.hProcess );
+		concurrency::create_task( [&info]()
+		{
+			WaitForSingleObject( info.hProcess, INFINITE );
+			CloseHandle( info.hProcess );
+		} ).then( [this]()
+		{
+			this->SetDlgItemText( IDC_EDT_FILEMAP, m_fileMap );
+			if( this->IsWindowEnabled() == FALSE )
+			{
+				this->EnableWindow( TRUE );	//	強制終了対策
+			}
+		} );
 	}
 	//ShellExecute( hwndOwner, nullptr, modulePath, param, nullptr, SW_SHOWNORMAL );
 }

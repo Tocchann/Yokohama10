@@ -3,7 +3,7 @@
 //
 
 #pragma once
-
+#include <atlfile.h>
 
 // CClientAppDlg ダイアログ
 class CClientAppDlg : public CDialog
@@ -24,6 +24,7 @@ public:
 // 実装
 protected:
 	HICON m_hIcon;
+	CAtlFileMapping<TCHAR>	m_fileMap;
 
 	// 生成された、メッセージ割り当て関数
 	virtual BOOL OnInitDialog();

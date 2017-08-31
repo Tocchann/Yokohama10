@@ -4,6 +4,7 @@
 
 #pragma once
 #include <atlfile.h>
+#include "afxwin.h"
 
 // CHostAppDlg ダイアログ
 class CHostAppDlg : public CDialog

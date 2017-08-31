@@ -51,6 +51,18 @@ BOOL CClientAppDlg::OnInitDialog()
 	{
 		GetDlgItem( IDC_BTN_SEND_MSG )->EnableWindow( FALSE );
 	}
+	auto hRes = m_fileMap.OpenMapping( _T( "Wankuma-Yokohama#10-SharedMem" ), 1024 );
+	if( FAILED( hRes ) )
+	{
+		GetDlgItem( IDC_EDT_FILEMAP )->EnableWindow( FALSE );
+		CString msg;
+		msg.Format( _T( "ファイルマップの作成に失敗しました。(%d)" ), SCODE_CODE( hRes ) );
+		SetDlgItemText( IDC_EDT_FILEMAP, msg );
+	}
+	else
+	{
+		SetDlgItemText( IDC_EDT_FILEMAP, m_fileMap );
+	}
 	return TRUE;  // フォーカスをコントロールに設定した場合を除き、TRUE を返します。
 }
 
@@ -60,6 +72,10 @@ void CClientAppDlg::OnBnClickedBtnSendMsg()
 	if( !UpdateData() )
 	{
 		return;
+	}
+	if( GetDlgItem( IDC_EDT_FILEMAP )->IsWindowEnabled() )
+	{
+		GetDlgItemText( IDC_EDT_FILEMAP, m_fileMap, m_fileMap.GetMappingSize() );
 	}
 	// オーナーウィンドウにWM_COPYDATAでユーザーの入力したデータを送る
 	CWnd* pwndOwner = GetOwner();

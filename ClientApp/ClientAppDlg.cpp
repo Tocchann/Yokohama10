@@ -75,7 +75,7 @@ void CClientAppDlg::OnBnClickedBtnSendMsg()
 	}
 	if( GetDlgItem( IDC_EDT_FILEMAP )->IsWindowEnabled() )
 	{
-		GetDlgItemText( IDC_EDT_FILEMAP, m_fileMap, m_fileMap.GetMappingSize() );
+		GetDlgItemText( IDC_EDT_FILEMAP, m_fileMap, static_cast<int>( m_fileMap.GetMappingSize() ) );
 	}
 	// オーナーウィンドウにWM_COPYDATAでユーザーの入力したデータを送る
 	CWnd* pwndOwner = GetOwner();

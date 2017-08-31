@@ -63,7 +63,7 @@ BOOL CHostAppDlg::OnInitDialog()
 
 void CHostAppDlg::OnOK()
 {
-	GetDlgItemText( IDC_EDT_FILEMAP, m_fileMap, m_fileMap.GetMappingSize() );
+	GetDlgItemText( IDC_EDT_FILEMAP, m_fileMap, static_cast<int>(m_fileMap.GetMappingSize()) );
 	TCHAR	modulePath[MAX_PATH];
 	GetModuleFileName( nullptr, modulePath, MAX_PATH );
 	*PathFindFileName( modulePath ) = _T( '\0' );
@@ -82,12 +82,14 @@ void CHostAppDlg::OnOK()
 	info.nShow = SW_SHOWNORMAL;
 	if( ShellExecuteEx( &info ) )
 	{
+		//	別タスク(異なるスレッドコンテキスト)で、呼び出したクライアントアプリの終了を待つ
 		concurrency::create_task( [&info]()
 		{
 			WaitForSingleObject( info.hProcess, INFINITE );
 			CloseHandle( info.hProcess );
 		} ).then( [this]()
 		{
+			//	クライアントアプリが終了後に呼び出されるが、どのスレッドで動いているかは特定できない(メインスレッド以外も十分あり得る)
 			this->SetDlgItemText( IDC_EDT_FILEMAP, m_fileMap );
 			if( this->IsWindowEnabled() == FALSE )
 			{

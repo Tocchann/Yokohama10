@@ -105,8 +105,8 @@ BOOL CHostAppDlg::OnCopyData( CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct )
 	// TODO: ここにメッセージ ハンドラー コードを追加するか、既定の処理を呼び出します。
 	if( pCopyDataStruct->dwData == MAKEFOURCC( 'F', 'M', 'M', 'T' ) )
 	{
-		CString msg( _T( "Received. WM_COPYDATA." ) );
-		msg.Format( _T( "Received. WM_COPYDATA.\"%s\"" ), static_cast<LPCTSTR>(pCopyDataStruct->lpData) );
+		CString msg;
+		msg.Format( _T( "Received WM_COPYDATA.\"%s\"" ), static_cast<LPCTSTR>(pCopyDataStruct->lpData) );
 	
 		SetDlgItemText( IDC_STC_RECEIVE_DATA, msg );
 		return TRUE;

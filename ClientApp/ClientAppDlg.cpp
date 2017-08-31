@@ -73,10 +73,6 @@ void CClientAppDlg::OnBnClickedBtnSendMsg()
 	{
 		return;
 	}
-	if( GetDlgItem( IDC_EDT_FILEMAP )->IsWindowEnabled() )
-	{
-		GetDlgItemText( IDC_EDT_FILEMAP, m_fileMap, static_cast<int>( m_fileMap.GetMappingSize() ) );
-	}
 	// オーナーウィンドウにWM_COPYDATAでユーザーの入力したデータを送る
 	CWnd* pwndOwner = GetOwner();
 	ASSERT( pwndOwner->GetSafeHwnd() != nullptr );
@@ -87,7 +83,23 @@ void CClientAppDlg::OnBnClickedBtnSendMsg()
 		data.cbData = (m_sendData.GetLength()+1)*sizeof( TCHAR );
 		data.lpData = m_sendData.GetBuffer();	//	CString は LPCTSTR しか引っ張り出せないので、LPTSTRを作り出す
 		HWND hwnd = *this;
-		pwndOwner->SendMessage( WM_COPYDATA, reinterpret_cast<WPARAM>(hwnd), reinterpret_cast<LPARAM>(&data) );
+		auto result = pwndOwner->SendMessage( WM_COPYDATA, reinterpret_cast<WPARAM>(hwnd), reinterpret_cast<LPARAM>(&data) );
 		m_sendData.ReleaseBuffer();
+		CString msg;
+		msg.Format( _T( "SendMessage( WM_COPYDATA ):%d\n" ), result );
+		msg += m_sendData;
+		AfxMessageBox( msg );
 	}
+}
+void CClientAppDlg::OnOK()
+{
+	if( !UpdateData() )
+	{
+		return;
+	}
+	if( GetDlgItem( IDC_EDT_FILEMAP )->IsWindowEnabled() )
+	{
+		GetDlgItemText( IDC_EDT_FILEMAP, m_fileMap, static_cast<int>(m_fileMap.GetMappingSize()) );
+	}
+	CDialog::OnOK();
 }

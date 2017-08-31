@@ -28,11 +28,10 @@ protected:
 
 	// 生成された、メッセージ割り当て関数
 	virtual BOOL OnInitDialog();
-	afx_msg void OnPaint();
-	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
 public:
 	CString m_strOwnerHwnd;
 	afx_msg void OnBnClickedBtnSendMsg();
 	CString m_sendData;
+	virtual void OnOK();
 };

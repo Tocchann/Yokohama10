@@ -3,6 +3,14 @@
 
 #include "stdafx.h"
 
+//	同時実行ランタイムを利用した呼び出しパターン
+//	call メッセージブロック
+//#define USE_CALL_SYNC_MODE
+
+//#define USE_CALL_ASYNC_MODE	
+//#define USE_TASK
+#define USE_LIGHT_THREAD
+
 #include <ppltasks.h>
 #include <agents.h>
 #include <concrt.h>
@@ -19,12 +27,13 @@ CString GetAnswerToRequest( LPCTSTR readStr );
 int main()
 {
 	_tsetlocale( LC_ALL, _T( "" ) );
-	//concurrency::call<HANDLE>	receiver( []( HANDLE pipe )
-	//{
-	//	//	このメソッドの処理が終了しないと次のタスクを処理できない
-	//	CommunicationToClient( pipe );
-	//	//concurrency::create_task( [pipe]() { CommunicationToClient( pipe ); } );
-	//} );
+
+#if defined(USE_CALL_SYNC_MODE) || defined(USE_CALL_ASYNC_MODE)
+	concurrency::call<HANDLE>	receiver( []( HANDLE pipe )
+	{
+		CommunicationToClient( pipe );
+	} );
+#endif
 	for(;;){
 		//	接続待機
 		HANDLE pipe = WaitConnectPipe();
@@ -33,11 +42,16 @@ int main()
 			break;	//	パイプが作れなかったらその時点で終了
 		}
 		//	作ったサーバーはクライアントタスクに流します(流しっぱなしであとは考慮しない)
-		//concurrency::send( receiver, pipe );
-		//concurrency::asend( receiver, pipe );	//	非同期に呼び出しているのだが。。。
+#if defined(USE_CALL_SYNC_MODE)
+		concurrency::send( receiver, pipe );
+#elif defined(USE_CALL_ASYNC_MODE)
+		concurrency::asend( receiver, pipe );	//	非同期に呼び出しているのだが。。。
+#elif defined(USE_TASK)
+		concurrency::create_task( [pipe]() { CommunicationToClient( pipe ); } );
+#elif defined(USE_LIGHT_THREAD)
 		//	処理は投げっぱなしなので、作り捨ての軽量タスクでよい
 		concurrency::CurrentScheduler::ScheduleTask( CommunicationToClient, pipe );
-		//concurrency::create_task( [pipe]() { CommunicationToClient( pipe ); } );
+#endif
 	}
 }
 //	名前付きパイプを作って、接続待ちする。

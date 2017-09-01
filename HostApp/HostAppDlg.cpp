@@ -83,10 +83,11 @@ void CHostAppDlg::OnOK()
 	if( ShellExecuteEx( &info ) )
 	{
 		//	別タスク(異なるスレッドコンテキスト)で、呼び出したクライアントアプリの終了を待つ
-		concurrency::create_task( [&info]()
+		HANDLE hProcess = info.hProcess;
+		concurrency::create_task( [hProcess]()
 		{
-			WaitForSingleObject( info.hProcess, INFINITE );
-			CloseHandle( info.hProcess );
+			WaitForSingleObject( hProcess, INFINITE );
+			CloseHandle( hProcess );
 		} ).then( [this]()
 		{
 			//	クライアントアプリが終了後に呼び出されるが、どのスレッドで動いているかは特定できない(メインスレッド以外も十分あり得る)

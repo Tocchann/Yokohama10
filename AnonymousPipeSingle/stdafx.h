@@ -11,6 +11,6 @@
 #include <tchar.h>
 
 #include <Windows.h>
+#include <locale>
 
-#include <ppltasks.h>
 // TODO: プログラムに必要な追加ヘッダーをここで参照してください

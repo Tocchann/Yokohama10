@@ -1,10 +1,10 @@
-// NamedPipeServerTask.cpp : コンソール アプリケーションのエントリ ポイントを定義します。
+// NamedPipeServerTask.cpp : �R���\�[�� �A�v���P�[�V�����̃G���g�� �|�C���g���`���܂��B
 //
 
 #include "stdafx.h"
 
-//	同時実行ランタイムを利用した呼び出しパターン
-//	call メッセージブロック
+//	�������s�����^�C���𗘗p�����Ăяo���p�^�[��
+//	call ���b�Z�[�W�u���b�N
 //#define USE_CALL_SYNC_MODE
 
 //#define USE_CALL_ASYNC_MODE	
@@ -35,40 +35,40 @@ int main()
 	} );
 #endif
 	for(;;){
-		//	接続待機
+		//	�ڑ��ҋ@
 		HANDLE pipe = WaitConnectPipe();
 		if( pipe == nullptr )
 		{
-			break;	//	パイプが作れなかったらその時点で終了
+			break;	//	�p�C�v�����Ȃ������炻�̎��_�ŏI��
 		}
-		//	作ったサーバーはクライアントタスクに流します(流しっぱなしであとは考慮しない)
+		//	������T�[�o�[�̓N���C�A���g�^�X�N�ɗ����܂�(�������ςȂ��ł��Ƃ͍l�����Ȃ�)
 #if defined(USE_CALL_SYNC_MODE)
 		concurrency::send( receiver, pipe );
 #elif defined(USE_CALL_ASYNC_MODE)
-		concurrency::asend( receiver, pipe );	//	非同期に呼び出しているのだが。。。
+		concurrency::asend( receiver, pipe );	//	�񓯊��ɌĂяo���Ă���̂����B�B�B
 #elif defined(USE_TASK)
 		concurrency::create_task( [pipe]() { CommunicationToClient( pipe ); } );
 #elif defined(USE_LIGHT_THREAD)
-		//	処理は投げっぱなしなので、作り捨ての軽量タスクでよい
+		//	�����͓������ςȂ��Ȃ̂ŁA���̂Ă̌y�ʃ^�X�N�ł悢
 		concurrency::CurrentScheduler::ScheduleTask( CommunicationToClient, pipe );
 #endif
 	}
 }
-//	名前付きパイプを作って、接続待ちする。
+//	���O�t���p�C�v������āA�ڑ��҂�����B
 HANDLE WaitConnectPipe()
 {
 	_putts( _T( "Create and Connecting Pipe." ) );
 	HANDLE pipe = CreateNamedPipe(
-		pipeName,					//	パイプの名前
-		PIPE_ACCESS_DUPLEX,			// アクセスモード(双方向)
-		PIPE_TYPE_MESSAGE |			// 書き込みモード(メッセージモードはワード単位)
-		PIPE_READMODE_MESSAGE |		// 読み取りモード
-		PIPE_WAIT,					// ブロッキングモード(PIPE_NOWAITは今は使わないので必ずブロッキングモードにする)
-		PIPE_UNLIMITED_INSTANCES,	// 最大インスタンス数は無制限
-		bufSize,					// 読み取り用バッファサイズ
-		bufSize,					// 書き込み用バッファサイズ
-		0,							// クライアントがWaitNamedPipe で NMPWAIT_USE_DEFAULT_WAIT を指定した時の待ち時間
-		nullptr );				// セキュリティ記述子(SECURITY_ATTRIBUTES*)
+		pipeName,					//	�p�C�v�̖��O
+		PIPE_ACCESS_DUPLEX,			// �A�N�Z�X���[�h(�o����)
+		PIPE_TYPE_MESSAGE |			// �������݃��[�h(���b�Z�[�W���[�h�̓��[�h�P��)
+		PIPE_READMODE_MESSAGE |		// �ǂݎ�胂�[�h
+		PIPE_WAIT,					// �u���b�L���O���[�h(PIPE_NOWAIT�͍��͎g��Ȃ��̂ŕK���u���b�L���O���[�h�ɂ���)
+		PIPE_UNLIMITED_INSTANCES,	// �ő�C���X�^���X���͖�����
+		bufSize,					// �ǂݎ��p�o�b�t�@�T�C�Y
+		bufSize,					// �������ݗp�o�b�t�@�T�C�Y
+		0,							// �N���C�A���g��WaitNamedPipe �� NMPWAIT_USE_DEFAULT_WAIT ���w�肵�����̑҂�����
+		nullptr );				// �Z�L�����e�B�L�q�q(SECURITY_ATTRIBUTES*)
 		
 	if( pipe == INVALID_HANDLE_VALUE )
 	{
@@ -80,7 +80,7 @@ HANDLE WaitConnectPipe()
 		if( !pipeConnected )
 		{
 			auto errorCode = GetLastError();
-			//	CreateNamedPipeした時点でパイプにつながっていた場合(クライアント側が作るほうが先の場合)
+			//	CreateNamedPipe�������_�Ńp�C�v�ɂȂ����Ă����ꍇ(�N���C�A���g�������ق�����̏ꍇ)
 			if( errorCode == ERROR_PIPE_CONNECTED )
 			{
 				pipeConnected = TRUE;
@@ -110,7 +110,7 @@ HANDLE WaitConnectPipe()
 }
 void CommunicationToClient( HANDLE hPipe )
 {
-	//	ここで、あらかじめ決めておいた読み書きが行われる。今回は、MSDNのサンプルと同じ段取り
+	//	�����ŁA���炩���ߌ��߂Ă������ǂݏ������s����B����́AMSDN�̃T���v���Ɠ����i���
 	TCHAR	readbuf[bufSize];
 	if( hPipe == nullptr )
 	{

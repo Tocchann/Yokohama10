@@ -16,7 +16,7 @@ int _tmain( VOID )
 	BOOL   fConnected = FALSE;
 	DWORD  dwThreadId = 0;
 	HANDLE hPipe = INVALID_HANDLE_VALUE, hThread = NULL;
-	//LPTSTR lpszPipename = TEXT( "\\\\.\\pipe\\mynamedpipe\\sub" );
+	//LPTSTR lpszPipename = TEXT( "\\\\.\\pipe\\mynamedpipe" );
 	LPCTSTR lpszPipename = _T( "\\\\.\\pipe\\Wankuma\\Yokohama\\10\\Pipe" );
 
 	// The main loop creates an instance of the named pipe and 

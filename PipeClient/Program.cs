@@ -9,8 +9,7 @@ class PipeClient
 	static void Main( string[] args )
 	{
 		//\\\\.\\pipe\\Wankuma\\Yokohama\\10\\Pipe
-		using( NamedPipeClientStream pipeClient =
-			new NamedPipeClientStream( ".", @"Wankuma\Yokohama\10\Pipe", PipeDirection.InOut ) )
+		using( var pipeClient = new NamedPipeClientStream( ".", @"Wankuma\Yokohama\10\Pipe", PipeDirection.InOut ) )
 		{
 
 			// Connect to the pipe or wait until the pipe is available.

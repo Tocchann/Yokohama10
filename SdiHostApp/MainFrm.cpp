@@ -112,7 +112,7 @@ BOOL CMainFrame::OnCopyData( CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct )
 		auto pView = GetActiveView();
 		if( pView != nullptr )
 		{
-			return pView->SendMessage( WM_COPYDATA, reinterpret_cast<WPARAM>(pWnd->GetSafeHwnd()), reinterpret_cast<LPARAM>(pCopyDataStruct) );
+			return static_cast<BOOL>(pView->SendMessage( WM_COPYDATA, reinterpret_cast<WPARAM>(pWnd->GetSafeHwnd()), reinterpret_cast<LPARAM>(pCopyDataStruct) ) );
 		}
 	}
 	return CFrameWnd::OnCopyData( pWnd, pCopyDataStruct );

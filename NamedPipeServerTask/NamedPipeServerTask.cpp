@@ -8,8 +8,8 @@
 //#define USE_CALL_SYNC_MODE
 
 //#define USE_CALL_ASYNC_MODE	
-//#define USE_TASK
-#define USE_LIGHT_THREAD
+#define USE_TASK
+//#define USE_LIGHT_THREAD
 
 #include <ppltasks.h>
 #include <agents.h>
